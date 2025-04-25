@@ -55,14 +55,14 @@ const Projects = () => {
   const [selectedCompanyClients, setSelectedCompanyClients] = useState<Client[]>([]);
   const [activeTab, setActiveTab] = useState("all");
   const [viewMode, setViewMode] = useState<"grid" | "list">("grid");
-
   const handleAddProject = () => {
     if (newProject.name.trim() && newProject.companyId && newProject.estimatedHours && newProject.hourlyRate > 0) {
       addProject({
         ...newProject,
         name: newProject.name.trim(),
-        description: newProject.description.trim(),
-        notes: newProject.notes?.trim(),
+        description: newProject.description.trim() || null,
+        notes: newProject.notes?.trim() || null,
+        endDate: newProject.endDate || null,
       });
       setNewProject({
         name: "",

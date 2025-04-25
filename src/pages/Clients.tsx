@@ -58,14 +58,13 @@ const Clients = () => {
       companyName: company.name,
     }))
   );
-
   const handleAddClient = () => {
     if (newClient.name.trim() && newClient.companyId) {
       addClient({
         name: newClient.name.trim(),
         companyId: newClient.companyId,
-        email: newClient.email.trim() || undefined,
-        phone: newClient.phone.trim() || undefined,
+        email: newClient.email.trim() || null,
+        phone: newClient.phone.trim() || null,
       });
       setNewClient({ name: "", companyId: "", email: "", phone: "" });
       setIsAddOpen(false);

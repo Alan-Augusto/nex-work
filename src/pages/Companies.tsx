@@ -36,7 +36,7 @@ const Companies = () => {
     if (newCompany.name.trim()) {
       addCompany({
         name: newCompany.name.trim(),
-        logoUrl: newCompany.logoUrl.trim() || undefined,
+        logoUrl: newCompany.logoUrl.trim() || null,
       });
       setNewCompany({ name: "", logoUrl: "" });
       setIsAddOpen(false);
