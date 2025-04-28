@@ -1,24 +1,31 @@
-
+import React, { useMemo } from "react";
 import { useApp } from "@/contexts/AppContext";
+import MonthFilter from "@/components/MonthFilter";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
-import { calculateTotalProjectsValue, formatCurrency, getCurrentMonthProjects, parseHourString } from "@/lib/utils";
+import { calculateTotalProjectsValue, formatCurrency, parseHourString } from "@/lib/utils";
 import { BarChart, Bar, XAxis, YAxis, CartesianGrid, ResponsiveContainer, Tooltip } from "recharts";
 import { Clock, DollarSign, BarChart3, Calendar } from "lucide-react";
 
 const Dashboard = () => {
-  const { projects, companies } = useApp();
-  
-  const currentMonthProjects = getCurrentMonthProjects(projects);
-  const monthlyRevenue = calculateTotalProjectsValue(currentMonthProjects);
-  
-  // Calculate total hours for this month
-  const totalHours = currentMonthProjects.reduce((total, project) => {
+  const { projects, companies, selectedMonth } = useApp();
+
+  const filteredProjects = useMemo(() => {
+    return projects.filter((project) => {
+      const projectMonth = project.startDate.slice(0, 7); // Assuming startDate is in ISO format
+      return projectMonth === selectedMonth;
+    });
+  }, [projects, selectedMonth]);
+
+  const monthlyRevenue = calculateTotalProjectsValue(filteredProjects);
+
+  // Calculate total hours for the selected month
+  const totalHours = filteredProjects.reduce((total, project) => {
     return total + parseHourString(project.estimatedHours);
   }, 0);
-  
+
   // Generate company data for chart
   const companyData = companies.map(company => {
-    const companyProjects = projects.filter(p => p.companyId === company.id);
+    const companyProjects = filteredProjects.filter(p => p.companyId === company.id);
     const value = calculateTotalProjectsValue(companyProjects);
     return {
       name: company.name,
@@ -26,17 +33,16 @@ const Dashboard = () => {
     };
   }).filter(item => item.value > 0);
 
-  const currentDate = new Date();
-  const currentMonthName = new Intl.DateTimeFormat('pt-BR', { month: 'long' }).format(currentDate);
-
   return (
     <div className="space-y-6 animate-fade-in">
       <div>
         <h1 className="text-3xl font-bold tracking-tight">Dashboard</h1>
         <p className="text-muted-foreground">
-          Visão geral dos seus projetos e rendimentos para {currentMonthName}
+          Visão geral dos seus projetos e rendimentos
         </p>
       </div>
+
+      <MonthFilter />
 
       <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4">
         <Card>
@@ -49,7 +55,7 @@ const Dashboard = () => {
           <CardContent>
             <div className="text-2xl font-bold">{formatCurrency(monthlyRevenue)}</div>
             <p className="text-xs text-muted-foreground">
-              {currentMonthProjects.length} projetos ativos
+              {filteredProjects.length} projetos ativos
             </p>
           </CardContent>
         </Card>
@@ -64,7 +70,7 @@ const Dashboard = () => {
               {Math.floor(totalHours)}h {Math.round((totalHours % 1) * 60)}m
             </div>
             <p className="text-xs text-muted-foreground">
-              Média de {(totalHours / (currentMonthProjects.length || 1)).toFixed(1)}h por projeto
+              Média de {(totalHours / (filteredProjects.length || 1)).toFixed(1)}h por projeto
             </p>
           </CardContent>
         </Card>
@@ -154,8 +160,8 @@ const Dashboard = () => {
           </CardHeader>
           <CardContent>
             <div className="space-y-4">
-              {projects.length > 0 ? (
-                projects
+              {filteredProjects.length > 0 ? (
+                filteredProjects
                   .sort((a, b) => new Date(b.startDate).getTime() - new Date(a.startDate).getTime())
                   .slice(0, 5)
                   .map((project) => {

@@ -32,6 +32,9 @@ interface AppContextType {
 
     accentColor: AccentColor;
     setAccentColor: (color: AccentColor) => void;
+
+    selectedMonth: string;
+    setSelectedMonth: (month: string) => void;
 }
 
 export type AccentColor = "purple" | "blue" | "green" | "orange" | "pink" | "teal" | "amber" | "red" | "indigo";
@@ -43,6 +46,10 @@ export const AppProvider = ({ children }: { children: React.ReactNode }) => {
     const [projects, setProjects] = useState<Project[]>([]);
     const [theme, setTheme] = useState<"light" | "dark">("light");
     const [accentColor, setAccentColor] = useState<AccentColor>("purple");
+    const [selectedMonth, setSelectedMonth] = useState<string>(() => {
+        const currentMonth = new Date().toISOString().slice(0, 7); // Format: YYYY-MM
+        return currentMonth;
+    });
 
     // Fetch companies from Firestore
     useEffect(() => {
@@ -185,7 +192,9 @@ export const AppProvider = ({ children }: { children: React.ReactNode }) => {
                 theme,
                 setTheme,
                 accentColor,
-                setAccentColor
+                setAccentColor,
+                selectedMonth,
+                setSelectedMonth
             }}
         >
             {children}
