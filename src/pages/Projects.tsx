@@ -27,12 +27,12 @@ import {
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
-import { formatCurrency, formatHourString, parseHourString } from "@/lib/utils";
+import { formatCurrency, parseHourString } from "@/lib/utils";
 import { Client, Project, ProjectStatus } from "@/types";
 import { Calendar, CircleDollarSign, Clock, Edit, LayoutGrid, List, Plus, Trash2 } from "lucide-react";
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { Tabs, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { StatusMenu } from "@/components/StatusMenu";
-import { StatusBadge } from "@/components/StatusBadge";
+// Removed unused import
 
 const Projects = () => {
   const { companies, projects, addProject, updateProject, deleteProject } = useApp();
@@ -139,14 +139,14 @@ const Projects = () => {
 
   const handleEstimatedHoursChange = (value: string, isEdit: boolean = false) => {
     // Format input to maintain HH:MM format
-    let formattedValue = value.replace(/[^0-9:]/g, "");
+    let formattedValue = value?.replace(/[^0-9:]/g, "");
     const parts = formattedValue.split(":");
     
-    if (parts.length > 2) {
+    if (parts?.length > 2) {
       formattedValue = `${parts[0]}:${parts[1]}`;
-    } else if (parts.length === 2 && parts[1].length > 2) {
-      formattedValue = `${parts[0]}:${parts[1].substring(0, 2)}`;
-    } else if (parts.length === 1 && formattedValue.length > 0) {
+    } else if (parts?.length === 2 && parts[1].length > 2) {
+        formattedValue = `${parts[0]}:${parts[1] ? parts[1].substring(0, 2) : ""}`;
+    } else if (parts?.length === 1 && formattedValue?.length > 0) {
       formattedValue = `${parts[0]}`;
       if (formattedValue.includes(":")) {
         formattedValue = `${parts[0].replace(":", "")}:`;
@@ -201,7 +201,7 @@ const Projects = () => {
               <Button
                 size="sm"
                 className="flex items-center gap-1"
-                disabled={companies.length === 0}
+                disabled={companies?.length === 0}
               >
                 <Plus className="h-4 w-4" />
                 <span>Add</span>
@@ -241,7 +241,7 @@ const Projects = () => {
                       onValueChange={(value) =>
                         setNewProject({ ...newProject, clientId: value })
                       }
-                      disabled={selectedCompanyClients.length === 0}
+                      disabled={selectedCompanyClients?.length === 0}
                     >
                       <SelectTrigger>
                         <SelectValue placeholder="Select a client" />
@@ -418,7 +418,7 @@ const Projects = () => {
                     onValueChange={(value) =>
                       setEditProject({ ...editProject, clientId: value })
                     }
-                    disabled={selectedCompanyClients.length === 0}
+                    disabled={selectedCompanyClients?.length === 0}
                   >
                     <SelectTrigger>
                       <SelectValue placeholder="Select a client" />
@@ -701,8 +701,8 @@ const Projects = () => {
                     </CardContent>
                     <CardFooter>
                       <p className="text-xs text-muted-foreground">
-                        {project.description.substring(0, 100)}
-                        {project.description.length > 100 ? "..." : ""}
+                        {(project.description ?? "").substring(0, 100)}
+                        {(project.description?.length ?? 0) > 100 ? "..." : ""}
                       </p>
                     </CardFooter>
                   </Card>
